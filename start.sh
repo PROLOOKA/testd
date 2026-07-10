@@ -1,18 +1,12 @@
 #!/bin/bash
 
-# بدء خدمة MariaDB
-service mysql start
+# 1. تشغيل سيرفر MediaMTX في الخلفية
+echo "Starting MediaMTX Server..."
+mediamtx /app/config/mediamtx.yml &
 
-# بدء خدمة PHP-FPM
-service php7.4-fpm start || service php8.1-fpm start || service php-fpm start
-
-# بدء خدمة Nginx
-service nginx start
-
-# بدء خدمات Xtream UI
-if [ -d "/home/xtreamcodes/iptv_xtream_codes" ]; then
-    /home/xtreamcodes/iptv_xtream_codes/start_services.sh
-fi
-
-# إبقاء الحاوية قيد التشغيل
-tail -f /dev/null
+# 2. تشغيل واجهة التحكم (Node.js UI)
+echo "Starting MediaMTX Web UI..."
+cd /app/server
+# Railway يستخدم متغير PORT، سنقوم بتعديل بورت الواجهة ليتناسب معه
+export PORT=${PORT:-3000}
+node server.js
